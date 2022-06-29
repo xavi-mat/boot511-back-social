@@ -7,7 +7,9 @@ const { dbConnection } = require("./config/config");
 const { typeError } = require("./middleware/errors");
 const swaggerUI = require("swagger-ui-express");
 const docs = require("./docs/index");
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
