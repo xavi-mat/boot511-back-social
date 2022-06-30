@@ -1,5 +1,5 @@
 const handleValidationError = (err, res) => {
-    let errors = Object.values(err.errors).map(el => el.message);
+    let errors = Object.values(err.errors).map(el => el.message).join(' | ');
     res.status(400).send({ msg: errors });
 }
 
