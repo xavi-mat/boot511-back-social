@@ -30,7 +30,13 @@ const PostController = {
         try {
             const post = await Post.findById(req.params._id)
                 .populate('author', { username: 1, avatar: 1, role: 1 })
-                .populate({ path: 'comments', populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } } });
+                .populate({
+                    path: 'comments',
+                    populate: {
+                        path: 'author',
+                        select: { username: 1, avatar: 1, role: 1 }
+                    }
+                });
             return res.send({ msg: "Post", post });
         } catch (error) {
             error.origin = 'post';
@@ -42,7 +48,7 @@ const PostController = {
         try {
             let { page = 1, limit = 10, title } = req.query;
             if (title === undefined) {
-                return res.status(400).send({ msg: 'name is required' });
+                return res.status(400).send({ msg: 'title is required' });
             }
             if (title.length > 30) {
                 return res.status(400).send({ msg: "Search string too long" });
@@ -51,12 +57,12 @@ const PostController = {
             if (isNaN(limit)) { limit = 10; }
             limit = Math.max(1, Math.min(limit, 20));
             const titleRgx = new RegExp(title, 'i');
-            const total = await Post.count({ titleRgx });
+            const total = await Post.count({ title: titleRgx });
             const maxPages = Math.ceil(total / limit);
             // Current page
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages));
-            const posts = await Post.find({ titleRgx })
+            const posts = await Post.find({ title: titleRgx })
                 .sort('-updatedAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
