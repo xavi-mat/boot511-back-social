@@ -81,12 +81,12 @@ const PostController = {
             // Limit per page:
             if (isNaN(limit)) { limit = 10; }
             limit = Math.max(1, Math.min(limit, 20));
-            const total = await Post.count();
+            const total = await Post.count({ active: true });
             const maxPages = Math.ceil(total / limit);
             // Current page
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages));
-            const posts = await Post.find()
+            const posts = await Post.find({ active: true })
                 .sort('-updatedAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
