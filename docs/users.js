@@ -163,7 +163,7 @@ module.exports = {
     get: {
       tags: ["User's actions"],
       summary: "Get public user's info",
-      description: "Get public user's info by id: **minimal personal data:** _id, username, avatar; **Title** of posts, **ids** of comments, likes, followers, and following.",
+      description: "Get public user's info by id: **minimal personal data:** _id, username, avatar; **Text** of posts, **ids** of comments, likes, followers, and following.",
       operationId: "getUserById",
       parameters: [
         {

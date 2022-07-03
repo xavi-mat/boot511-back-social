@@ -5,9 +5,18 @@ const MAIN_URL = process.env.MAIN_URL;
 const CommentController = {
     async create(req, res, next) {
         try {
+            if (!req.user.active) {
+                return res.status(400).send({ msg: "Muted user. Can't comment" });
+            }
             const image = req.file ?
                 `${MAIN_URL}/imgs/${req.file.filename}` :
                 undefined;
+            const postExistsAndIsActive = await Comment.count(
+                { _id: req.body.postId, active: true }
+            );
+            if (!postExistsAndIsActive) {
+                return res.status(400).send({ msg: "Post not found" });
+            }
             const newComment = {
                 postId: req.body.postId,
                 text: req.body.text,
@@ -89,7 +98,8 @@ const CommentController = {
     },
     async getById(req, res, next) {
         try {
-            const comment = await Comment.findById(req.params._id)
+            const comment = await Comment
+                .findOne({ _id: req.params._id, active: true })
                 .populate({
                     path: 'author',
                     select: { username: 1, avatar: 1, role: 1 }
@@ -108,7 +118,7 @@ const CommentController = {
     async like(req, res, next) {
         try {
             const comment = await Comment.findOneAndUpdate(
-                { _id: req.params._id, likes: { $nin: req.user._id } },
+                { _id: req.params._id, likes: { $nin: req.user._id }, active: true },
                 { $push: { likes: req.user._id } },
                 { new: true }
             );

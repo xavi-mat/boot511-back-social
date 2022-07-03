@@ -94,8 +94,7 @@ const UserController = {
             usersId.forEach(async (userId) => {
                 for (let i = 0; i < 3; i++) {
                     const post = {
-                        title: faker.lorem.sentence(),
-                        body: faker.lorem.paragraph(),
+                        text: faker.lorem.paragraph().substring(0, 280),
                         author: userId,
                         image: faker.image.cats(300, 300, true),
                     };
@@ -104,7 +103,7 @@ const UserController = {
                     for (let i = 0; i < 2; i++) {
                         const comment = {
                             postId: newPost._id,
-                            text: faker.lorem.paragraph(),
+                            text: faker.lorem.paragraph().substring(0, 280),
                             author: usersId[Math.floor(Math.random() * usersId.length)],
                             image: faker.image.cats(300, 300, true),
                         };
@@ -124,8 +123,8 @@ const UserController = {
     async login(req, res, next) {
         try {
             const user = await User.findOne({ email: req.body.email })
-                .populate({ path: "posts", select: { title: 1 } })
-                .populate({ path: "likedPosts", select: { title: 1 } })
+                .populate({ path: "posts", select: { text: 1 } })
+                .populate({ path: "likedPosts", select: { text: 1 } })
                 .populate({ path: "following", select: { username: 1 } })
                 .populate({ path: "followers", select: { username: 1 } })
             if (!user) {
@@ -211,10 +210,10 @@ const UserController = {
     async follow(req, res, next) {
         try {
             if (req.user._id.toString() === req.params._id) {
-                return res.send({ msg: "Cant't follow yourself" });
+                return res.status(400).send({ msg: "Cant't follow yourself" });
             }
             const user = await User.findOneAndUpdate(
-                { _id: req.params._id, followers: { $nin: req.user._id } },
+                { _id: req.params._id, followers: { $nin: req.user._id }, active: true },
                 { $push: { followers: req.user._id } }
             );
             if (user) {
@@ -266,13 +265,15 @@ const UserController = {
             if (isNaN(limit)) { limit = 10; }
             limit = Math.max(1, Math.min(limit, 20));
             const username = new RegExp(name, 'i');
-            const total = await User.count({ username, role: { $nin: 'admin' } });
+            const total = await User.count(
+                { username, role: { $nin: 'admin' }, active: true }
+            );
             const maxPages = Math.ceil(total / limit);
             // Current page
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages))
             const users = await User.find(
-                { username, role: { $nin: 'admin' } },
+                { username, role: { $nin: 'admin' }, active: true },
                 { username: 1, avatar: 1, role: 1 })
                 .limit(limit)
                 .skip(limit * (page - 1));
@@ -285,11 +286,11 @@ const UserController = {
     },
     async getById(req, res, next) {
         try {
-            const user = await User.findById(
-                req.params._id,
+            const user = await User.findOne(
+                { _id: req.params._id, active: true },
                 { email: 0, passhash: 0, role: 0, confirmed: 0, tokens: 0 })
-                .populate({ path: 'posts', select: { title: 1 } })
-                .populate({ path: 'likedPosts', select: { title: 1 } })
+                .populate({ path: 'posts', select: { text: 1 } })
+                .populate({ path: 'likedPosts', select: { text: 1 } })
                 .populate({ path: 'following', select: { username: 1 } })
                 .populate({ path: 'followers', select: { username: 1 } })
             return res.send({ msg: "User data", user });

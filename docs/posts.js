@@ -132,14 +132,14 @@ module.exports = {
   "/posts/search": {
     get: {
       tags: ["Posts"],
-      summary: "Search a post by title",
-      description: "Search a post by title, case insensitive",
-      operationId: "searchPostByTitle",
+      summary: "Search a post by text",
+      description: "Search a post by text, case insensitive",
+      operationId: "searchPostByText",
       parameters: [
         {
-          name: "title",
+          name: "text",
           in: "query",
-          description: "Title to search for",
+          description: "Text to search for",
           required: true,
           schema: {
             type: "string"

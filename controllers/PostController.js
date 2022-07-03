@@ -5,12 +5,14 @@ const MAIN_URL = process.env.MAIN_URL;
 const PostController = {
     async create(req, res, next) {
         try {
+            if (!req.user.active) {
+                return res.status(400).send({msg: "Muted user. Can't post"});
+            }
             const image = req.file ?
                 `${MAIN_URL}/imgs/${req.file.filename}` :
                 undefined;
             const newPost = {
-                title: req.body.title,
-                body: req.body.body,
+                text: req.body.text,
                 author: req.user._id,
                 image,
             };
@@ -28,7 +30,8 @@ const PostController = {
     },
     async getById(req, res, next) {
         try {
-            const post = await Post.findById(req.params._id)
+            // const post = await Post.findById(req.params._id)
+            const post = await Post.findOne({ _id: req.params._id, active: true })
                 .populate('author', { username: 1, avatar: 1, role: 1 })
                 .populate({
                     path: 'comments',
@@ -44,25 +47,25 @@ const PostController = {
             next(error);
         }
     },
-    async searchByTitle(req, res, next) {
+    async searchByText(req, res, next) {
         try {
-            let { page = 1, limit = 10, title } = req.query;
-            if (title === undefined) {
-                return res.status(400).send({ msg: 'title is required' });
+            let { page = 1, limit = 10, text } = req.query;
+            if (text === undefined) {
+                return res.status(400).send({ msg: 'text is required' });
             }
-            if (title.length > 30) {
+            if (text.length > 30) {
                 return res.status(400).send({ msg: "Search string too long" });
             }
             // Pagination
             if (isNaN(limit)) { limit = 10; }
             limit = Math.max(1, Math.min(limit, 20));
-            const titleRgx = new RegExp(title, 'i');
-            const total = await Post.count({ title: titleRgx });
+            const textRgx = new RegExp(text, 'i');
+            const total = await Post.count({ text: textRgx, active: true });
             const maxPages = Math.ceil(total / limit);
             // Current page
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages));
-            const posts = await Post.find({ title: titleRgx })
+            const posts = await Post.find({ text: textRgx, active: true })
                 .sort('-updatedAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
@@ -70,7 +73,7 @@ const PostController = {
             return res.send({ msg: "Posts found", total, page, maxPages, posts });
         } catch (error) {
             error.origin = 'post';
-            error.suborigin = 'getByTitle';
+            error.suborigin = 'getByText';
             next(error);
         }
     },
@@ -108,8 +111,7 @@ const PostController = {
                 `${MAIN_URL}/imgs/${req.file.filename}` :
                 undefined;
             const updatedPost = {
-                title: req.body.title,
-                body: req.body.body,
+                text: req.body.text,
                 image,
             };
             const post = await Post.findOneAndUpdate(
@@ -178,7 +180,7 @@ const PostController = {
     async like(req, res, next) {
         try {
             const post = await Post.findOneAndUpdate(
-                { _id: req.params._id, likes: { $nin: req.user._id } },
+                { _id: req.params._id, likes: { $nin: req.user._id }, active: true },
                 { $push: { likes: req.user._id } },
                 { new: true }
             );
