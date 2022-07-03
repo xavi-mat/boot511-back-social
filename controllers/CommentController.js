@@ -11,7 +11,7 @@ const CommentController = {
             const image = req.file ?
                 `${MAIN_URL}/imgs/${req.file.filename}` :
                 undefined;
-            const postExistsAndIsActive = await Comment.count(
+            const postExistsAndIsActive = await Post.count(
                 { _id: req.body.postId, active: true }
             );
             if (!postExistsAndIsActive) {

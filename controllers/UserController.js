@@ -92,7 +92,7 @@ const UserController = {
             }
             // Write 30 posts
             usersId.forEach(async (userId) => {
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 11; i++) {
                     const post = {
                         text: faker.lorem.paragraph().substring(0, 280),
                         author: userId,
@@ -135,7 +135,7 @@ const UserController = {
                 return res.status(400).send({ msg: "Wrong credentials" });
             }
             if (!user.confirmed) {
-                return res.send({ msg: "Please, confirm your email" });
+                return res.status(400).send({ msg: "Please, confirm your email" });
             }
             const token = jwt.sign({ _id: user._id }, JWT_SECRET);
             while (user.tokens.length > 4) {
