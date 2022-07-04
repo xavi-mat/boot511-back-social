@@ -71,7 +71,7 @@ const CommentController = {
                 });
                 return res.send({ msg: "Comment deleted", comment });
             } else {
-                return res.send({ msg: "Error deleting comment" });
+                return res.status(404).send({ msg: "Error deleting comment" });
             }
         } catch (error) {
             error.origin = 'comment';

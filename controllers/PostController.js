@@ -31,7 +31,6 @@ const PostController = {
     },
     async getById(req, res, next) {
         try {
-            // const post = await Post.findById(req.params._id)
             const post = await Post.findOne({ _id: req.params._id, active: true })
                 .populate('author', { username: 1, avatar: 1, role: 1 })
                 .populate({
@@ -148,8 +147,13 @@ const PostController = {
                 { _id: req.params._id, author: req.user._id },
                 updatedPost,
                 { new: true }
-            );
-            return res.send({ msg: "Post updated", post });
+            )
+                .populate('author', { username: 1, avatar: 1, role: 1 });
+            if (post) {
+                return res.send({ msg: "Post updated", post });
+            } else {
+                return res.status(404).send({ msg: "Post not found" });
+            }
         } catch (error) {
             error.origin = 'post';
             error.suborigin = 'update';
