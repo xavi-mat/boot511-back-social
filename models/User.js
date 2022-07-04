@@ -38,14 +38,24 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 UserSchema.methods.toJSON = function () {
+
     const user = this._doc;
+
     user.followersCount = this._doc.followers?.length;
     user.followingCount = this._doc.following?.length;
-    user.postsCount = this._doc.posts?.length;
-    user.commentsCount = this._doc.comments?.length;
+    user.postsCount =     this._doc.posts?.length;
+    user.commentsCount =  this._doc.comments?.length;
+
     delete user.tokens;
     delete user.passhash;
     delete user.confirmed;
+    delete user.followers;
+    delete user.following;
+    delete user.posts;
+    delete user.comments;
+    delete user.likedPosts;
+    delete user.likedComments;
+
     return user;
 }
 

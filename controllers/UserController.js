@@ -122,11 +122,11 @@ const UserController = {
     },
     async login(req, res, next) {
         try {
-            const user = await User.findOne({ email: req.body.email })
-                .populate({ path: "posts", select: { text: 1 } })
-                .populate({ path: "likedPosts", select: { text: 1 } })
-                .populate({ path: "following", select: { username: 1 } })
-                .populate({ path: "followers", select: { username: 1 } })
+            const user = await User.findOne({ email: req.body.email });
+            // .populate({ path: "posts", select: { text: 1 } })
+            // .populate({ path: "likedPosts", select: { text: 1 } })
+            // .populate({ path: "following", select: { username: 1 } })
+            // .populate({ path: "followers", select: { username: 1 } })
             if (!user) {
                 return res.status(400).send({ msg: "Wrong credentials" });
             }
@@ -288,11 +288,11 @@ const UserController = {
         try {
             const user = await User.findOne(
                 { _id: req.params._id, active: true },
-                { email: 0, passhash: 0, role: 0, confirmed: 0, tokens: 0 })
-                .populate({ path: 'posts', select: { text: 1 } })
-                .populate({ path: 'likedPosts', select: { text: 1 } })
-                .populate({ path: 'following', select: { username: 1 } })
-                .populate({ path: 'followers', select: { username: 1 } })
+                { email: 0 })
+                // .populate({ path: 'posts', select: { text: 1 } })
+                // .populate({ path: 'likedPosts', select: { text: 1 } })
+                // .populate({ path: 'following', select: { username: 1 } })
+                // .populate({ path: 'followers', select: { username: 1 } })
             return res.send({ msg: "User data", user });
         } catch (error) {
             error.origin = 'user';

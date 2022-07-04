@@ -24,6 +24,13 @@ const PostSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },
 }, { timestamps: true });
 
+PostSchema.methods.toJSON = function () {
+    const post = this._doc;
+    post.commentsCount = this._doc.comments?.length;
+    post.likesCount = this._doc.likes?.length;
+    return post;
+}
+
 const Post = mongoose.model('Post', PostSchema);
 
 module.exports = Post;

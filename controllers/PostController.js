@@ -6,7 +6,7 @@ const PostController = {
     async create(req, res, next) {
         try {
             if (!req.user.active) {
-                return res.status(400).send({msg: "Muted user. Can't post"});
+                return res.status(400).send({ msg: "Muted user. Can't post" });
             }
             const image = req.file ?
                 `${MAIN_URL}/imgs/${req.file.filename}` :
@@ -94,14 +94,43 @@ const PostController = {
                 .limit(limit)
                 .skip(limit * (page - 1))
                 .populate('author', { username: 1, avatar: 1, role: 1 })
-                .populate({
-                    path: 'comments',
-                    populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
-                });
+                // .populate({
+                //     path: 'comments',
+                //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
+                // });
             return res.send({ msg: "All posts", total, page, maxPages, posts });
         } catch (error) {
             error.origin = 'post';
             error.suborigin = 'getAll';
+            next(error);
+        }
+    },
+    async getByUserId(req, res, next) {
+        try {
+            const userId = req.params._id;
+            // Pagination
+            let { page = 1, limit = 10 } = req.query;
+            // Limit per page
+            if (isNaN(limit)) { limit = 10; }
+            limit = Math.max(1, Math.min(limit, 20));
+            const total = await Post.count({ author: userId, active: true });
+            const maxPages = Math.ceil(total / limit);
+            // Current page
+            if (isNaN(page)) { page = 1; }
+            page = Math.max(1, Math.min(page, maxPages));
+            let posts = await Post.find({ author: userId, active: true })
+                .sort('-updatedAt')
+                .limit(limit)
+                .skip(limit * (page - 1))
+                // .populate('author', { username: 1, avatar: 1, role: 1 })
+                // .populate({
+                //     path: 'comments',
+                //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
+                // });
+            return res.send({ msg: "Posts by UserId", total, page, maxPages, posts });
+        } catch (error) {
+            error.origin = 'post';
+            error.suborigin = 'getByUserId';
             next(error);
         }
     },
