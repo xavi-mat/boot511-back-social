@@ -23,7 +23,11 @@ const CommentController = {
                 author: req.user._id,
                 image,
             };
-            const comment = await Comment.create(newComment);
+            let comment = await Comment.create(newComment)
+            comment = await comment.populate(
+                'author',
+                { username: 1, avatar: 1, role: 1 }
+            );
             const post = await Post.findByIdAndUpdate(
                 req.body.postId,
                 { $push: { comments: comment._id } },
@@ -37,7 +41,7 @@ const CommentController = {
                 req.user._id,
                 { $push: { comments: comment._id } }
             );
-            return res.status(201).send({ msg: "Comment created", comment, post });
+            return res.status(201).send({ msg: "Comment created", comment });
         } catch (error) {
             error.origin = 'comment';
             error.suborigin = 'create';

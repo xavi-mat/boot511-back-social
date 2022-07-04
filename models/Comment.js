@@ -25,6 +25,12 @@ const CommentSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },
 }, { timestamps: true });
 
+CommentSchema.methods.toJSON = function () {
+    const comment = this._doc;
+    comment.likesCount = this._doc.likes?.length;
+    return comment;
+}
+
 const Comment = mongoose.model('Comment', CommentSchema);
 
 module.exports = Comment;

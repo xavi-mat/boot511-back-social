@@ -16,7 +16,8 @@ const PostController = {
                 author: req.user._id,
                 image,
             };
-            const post = await Post.create(newPost);
+            let post = await Post.create(newPost);
+            post = await post.populate('author', { username: 1, avatar: 1, role: 1 })
             await User.findByIdAndUpdate(
                 req.user._id,
                 { $push: { posts: post._id } }
@@ -94,10 +95,10 @@ const PostController = {
                 .limit(limit)
                 .skip(limit * (page - 1))
                 .populate('author', { username: 1, avatar: 1, role: 1 })
-                // .populate({
-                //     path: 'comments',
-                //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
-                // });
+            // .populate({
+            //     path: 'comments',
+            //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
+            // });
             return res.send({ msg: "All posts", total, page, maxPages, posts });
         } catch (error) {
             error.origin = 'post';
@@ -122,11 +123,11 @@ const PostController = {
                 .sort('-updatedAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
-                // .populate('author', { username: 1, avatar: 1, role: 1 })
-                // .populate({
-                //     path: 'comments',
-                //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
-                // });
+            // .populate('author', { username: 1, avatar: 1, role: 1 })
+            // .populate({
+            //     path: 'comments',
+            //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
+            // });
             return res.send({ msg: "Posts by UserId", total, page, maxPages, posts });
         } catch (error) {
             error.origin = 'post';
@@ -166,7 +167,7 @@ const PostController = {
                 // Delete reference to post from author
                 await User.findByIdAndUpdate(
                     req.user_id,
-                    { $pull: { comments: post._id } }
+                    { $pull: { posts: post._id } }
                 );
                 // Delete references of likes from users
                 post.likes.forEach(async (userId) => {
@@ -195,10 +196,9 @@ const PostController = {
                         });
                     }
                 });
-                // // TODO: Delete all comments of the deleted post AND the references to these coments in their authors
                 return res.send({ msg: "Post deleted", post });
             } else {
-                return res.send({ msg: "Can't delete post" });
+                return res.status(400).send({ msg: "Can't delete post" });
             }
         } catch (error) {
             error.origin = 'post';
