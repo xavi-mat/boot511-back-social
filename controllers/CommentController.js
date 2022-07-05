@@ -92,8 +92,13 @@ const CommentController = {
                 req.params._id,
                 updatedComment,
                 { new: true }
-            );
-            return res.send({ msg: "Comment updated", comment });
+            )
+                .populate('author', { username: 1, avatar: 1, role: 1 })
+            if (comment) {
+                return res.send({ msg: "Comment updated", comment });
+            } else {
+                return res.status(404).send({ msg: "Comment not found" });
+            }
         } catch (error) {
             error.origin = 'comment';
             error.suborigin = 'update';
