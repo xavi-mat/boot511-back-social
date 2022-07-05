@@ -26,9 +26,15 @@ const PostSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 PostSchema.methods.toJSON = function () {
+
     const post = this._doc;
+
     post.commentsCount = this._doc.comments?.length;
     post.likesCount = this._doc.likes?.length;
+
+    delete post.comments;
+    delete post.likes;
+
     return post;
 }
 
