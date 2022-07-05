@@ -7,6 +7,7 @@ const { uploadImg } = require("../middleware/multer");
 
 router.post('/', authentication, uploadImg.single('image'), CommentController.create);
 router.get('/id/:_id', CommentController.getById);
+router.get('/post-id/:postId', CommentController.getByPostId);
 router.put('/id/:_id', authentication, isCommentAuthor, uploadImg.single('image'),
     CommentController.update);
 router.put('/like/:_id', authentication, CommentController.like);

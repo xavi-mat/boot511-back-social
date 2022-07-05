@@ -124,6 +124,35 @@ const CommentController = {
             next(error);
         }
     },
+    async getByPostId(req, res, next) {
+        try {
+            // Pagination
+            let { page = 1, limit = 10 } = req.query;
+            // Limit per page:
+            if (isNaN(limit)) { limit = 10; }
+            limit = Math.max(1, Math.min(limit, 20));
+            const total = await Comment.count({
+                postId: req.params.postId, active: true
+            });
+            const maxPages = Math.ceil(total / limit);
+            // Current page
+            if (isNaN(page)) { page = 1; }
+            page = Math.max(1, Math.min(page, maxPages));
+            const comments = await Comment
+                .find({ postId: req.params.postId, active: true })
+                .sort('-updatedAt')
+                .limit(limit)
+                .skip(limit * (page - 1))
+                .populate('author', { username: 1, avatar: 1, role: 1 })
+            return res.send({
+                msg: "Comments by PostId", total, page, maxPages, comments
+            });
+        } catch (error) {
+            error.origin = 'comment';
+            error.suborigin = 'getByPostId';
+            next(error);
+        }
+    },
     async like(req, res, next) {
         try {
             const comment = await Comment.findOneAndUpdate(

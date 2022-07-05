@@ -29,7 +29,7 @@ const CommentSchema = new mongoose.Schema({
 CommentSchema.methods.toJSON = function () {
     const comment = this._doc;
     comment.likesCount = this._doc.likes?.length;
-    delete post.likes;
+    delete comment.likes;
     return comment;
 }
 
