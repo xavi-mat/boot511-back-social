@@ -146,7 +146,7 @@ const PostController = {
             const post = await Post.findOneAndUpdate(
                 { _id: req.params._id, author: req.user._id },
                 updatedPost,
-                { new: true }
+                { new: true, runValidators: true }
             )
                 .populate('author', { username: 1, avatar: 1, role: 1 });
             if (post) {

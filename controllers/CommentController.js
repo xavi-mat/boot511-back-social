@@ -91,7 +91,7 @@ const CommentController = {
             const comment = await Comment.findByIdAndUpdate(
                 req.params._id,
                 updatedComment,
-                { new: true }
+                { new: true, runValidators: true }
             )
                 .populate('author', { username: 1, avatar: 1, role: 1 })
             if (comment) {

@@ -10,6 +10,7 @@ const CommentSchema = new mongoose.Schema({
     text: {
         type: String,
         required: [true, 'text is required'],
+        trim: true,
         maxLength: [280, 'post must be 280 characters maximum'],
     },
     author: {
