@@ -33,14 +33,20 @@ const PostController = {
         try {
             const post = await Post.findOne({ _id: req.params._id, active: true })
                 .populate('author', { username: 1, avatar: 1, role: 1 })
-                .populate({
-                    path: 'comments',
-                    populate: {
-                        path: 'author',
-                        select: { username: 1, avatar: 1, role: 1 }
-                    }
-                });
-            return res.send({ msg: "Post", post });
+            if (post) {
+                const { userId } = req.query;
+                let youLiked = 0;
+                if (userId) {
+                    youLiked = await Post.count({
+                        _id: post._id,
+                        active: true,
+                        likes: { $in: userId }
+                    });
+                }
+                return res.send({ msg: "Post", post, youLiked });
+            } else {
+                return res.status(404).send({ msg: "Post not found" });
+            }
         } catch (error) {
             error.origin = 'post';
             error.suborigin = 'getById';
@@ -215,7 +221,7 @@ const PostController = {
             const post = await Post.findOneAndUpdate(
                 { _id: req.params._id, likes: { $nin: req.user._id }, active: true },
                 { $push: { likes: req.user._id } },
-                { new: true }
+                { new: true, timestamps: false }
             );
             if (post) {
                 await User.findByIdAndUpdate(
@@ -234,9 +240,10 @@ const PostController = {
     },
     async unlike(req, res, next) {
         try {
-            const post = await Post.findByIdAndUpdate(
-                req.params._id,
-                { $pull: { likes: req.user._id } }
+            const post = await Post.findOneAndUpdate(
+                { _id: req.params._id, active: true },
+                { $pull: { likes: req.user._id } },
+                { timestamps: false }
             );
             if (post) {
                 await User.findByIdAndUpdate(
@@ -245,7 +252,7 @@ const PostController = {
                 );
                 return res.send({ msg: "Post unliked" });
             } else {
-                return res.send({ msg: "Error unliking post" });
+                return res.status(404).send({ msg: "Error unliking post" });
             }
         } catch (error) {
             error.origin = 'post';
