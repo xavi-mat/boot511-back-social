@@ -287,6 +287,7 @@ const UserController = {
             const users = await User.find(
                 { username, role: { $nin: 'admin' }, active: true },
                 { username: 1, avatar: 1, role: 1 })
+                .sort("username")
                 .limit(limit)
                 .skip(limit * (page - 1));
             return res.send({ msg: "Users found", total, page, maxPages, users });
