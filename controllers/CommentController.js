@@ -140,7 +140,7 @@ const CommentController = {
             page = Math.max(1, Math.min(page, maxPages));
             const comments = await Comment
                 .find({ postId: req.params.postId, active: true })
-                .sort('-updatedAt')
+                .sort('-createdAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
                 .populate('author', { username: 1, avatar: 1, role: 1 })
@@ -165,7 +165,7 @@ const CommentController = {
                     req.user._id,
                     { $push: { likedComments: comment._id } }
                 );
-                return res.send({ msg: "Comment liked", comment });
+                return res.send({ msg: "Comment liked", _id: comment._id });
             } else {
                 return res.status(400).send({ msg: "Error liking comment" });
             }
@@ -186,7 +186,7 @@ const CommentController = {
                     req.user._id,
                     { $pull: { likedComments: comment._id } }
                 );
-                return res.send({ msg: "Comment unliked" });
+                return res.send({ msg: "Comment unliked", _id: comment._id });
             } else {
                 res.status(400).send({ msg: "Error unliking comment" });
             }

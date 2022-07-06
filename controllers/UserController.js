@@ -96,7 +96,7 @@ const UserController = {
                     const post = {
                         text: faker.lorem.paragraph().substring(0, 280),
                         author: userId,
-                        image: faker.image.cats(300, 300, true),
+                        image: faker.image.cats(300, 150, true),
                     };
                     const newPost = await Post.create(post);
                     await User.findByIdAndUpdate(userId, { $push: { posts: newPost._id } });
@@ -105,7 +105,7 @@ const UserController = {
                             postId: newPost._id,
                             text: faker.lorem.paragraph().substring(0, 280),
                             author: usersId[Math.floor(Math.random() * usersId.length)],
-                            image: faker.image.cats(300, 300, true),
+                            image: faker.image.cats(300, 150, true),
                         };
                         const newComment = await Comment.create(comment);
                         await Post.findByIdAndUpdate(newPost._id, { $push: { comments: newComment._id } });
@@ -122,11 +122,11 @@ const UserController = {
     },
     async login(req, res, next) {
         try {
-            const user = await User.findOne({ email: req.body.email });
+            let user = await User.findOne({ email: req.body.email })
+            // .populate({ path: "following", select: { username: 1, avatar: 1, role: 1  } })
+            // .populate({ path: "followers", select: { username: 1, avatar: 1, role: 1  } })
             // .populate({ path: "posts", select: { text: 1 } })
             // .populate({ path: "likedPosts", select: { text: 1 } })
-            // .populate({ path: "following", select: { username: 1 } })
-            // .populate({ path: "followers", select: { username: 1 } })
             if (!user) {
                 return res.status(400).send({ msg: "Wrong credentials" });
             }
@@ -143,6 +143,18 @@ const UserController = {
             }
             user.tokens.push(token);
             await user.save();
+            user = user.toObject();
+            user.followersCount = user.followers?.length;
+            user.followingCount = user.following?.length;
+            user.postsCount = user.posts?.length;
+            user.commentsCount = user.comments?.length;
+            delete user.tokens;
+            delete user.passhash;
+            delete user.confirmed;
+            delete user.followers;
+            delete user.following;
+            delete user.posts;
+            delete user.comments;
             return res.send({ msg: `Welcome ${user.username}`, token, user });
         } catch (error) {
             error.origin = 'user';
@@ -289,10 +301,10 @@ const UserController = {
             const user = await User.findOne(
                 { _id: req.params._id, active: true },
                 { email: 0 })
-                // .populate({ path: 'posts', select: { text: 1 } })
-                // .populate({ path: 'likedPosts', select: { text: 1 } })
-                // .populate({ path: 'following', select: { username: 1 } })
-                // .populate({ path: 'followers', select: { username: 1 } })
+            // .populate({ path: 'posts', select: { text: 1 } })
+            // .populate({ path: 'likedPosts', select: { text: 1 } })
+            // .populate({ path: 'following', select: { username: 1 } })
+            // .populate({ path: 'followers', select: { username: 1 } })
             return res.send({ msg: "User data", user });
         } catch (error) {
             error.origin = 'user';

@@ -34,16 +34,7 @@ const PostController = {
             const post = await Post.findOne({ _id: req.params._id, active: true })
                 .populate('author', { username: 1, avatar: 1, role: 1 })
             if (post) {
-                const { userId } = req.query;
-                let youLiked = 0;
-                if (userId) {
-                    youLiked = await Post.count({
-                        _id: post._id,
-                        active: true,
-                        likes: { $in: userId }
-                    });
-                }
-                return res.send({ msg: "Post", post, youLiked });
+                return res.send({ msg: "Post", post });
             } else {
                 return res.status(404).send({ msg: "Post not found" });
             }
@@ -72,7 +63,7 @@ const PostController = {
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages));
             const posts = await Post.find({ text: textRgx, active: true })
-                .sort('-updatedAt')
+                .sort('-createdAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
                 .populate('author', { username: 1, avatar: 1, role: 1 });
@@ -96,7 +87,7 @@ const PostController = {
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages));
             const posts = await Post.find({ active: true })
-                .sort('-updatedAt')
+                .sort('-createdAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
                 .populate('author', { username: 1, avatar: 1, role: 1 })
@@ -125,7 +116,7 @@ const PostController = {
             if (isNaN(page)) { page = 1; }
             page = Math.max(1, Math.min(page, maxPages));
             let posts = await Post.find({ author: userId, active: true })
-                .sort('-updatedAt')
+                .sort('-createdAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
             // .populate('author', { username: 1, avatar: 1, role: 1 })
@@ -228,7 +219,7 @@ const PostController = {
                     req.user._id,
                     { $push: { likedPosts: post._id } }
                 );
-                return res.send({ msg: "Post liked", post });
+                return res.send({ msg: "Post liked", _id: post._id });
             } else {
                 return res.status(400).send({ msg: 'Error liking post' });
             }
@@ -241,7 +232,7 @@ const PostController = {
     async unlike(req, res, next) {
         try {
             const post = await Post.findOneAndUpdate(
-                { _id: req.params._id, active: true },
+                { _id: req.params._id, likes: { $in: req.user._id }, active: true },
                 { $pull: { likes: req.user._id } },
                 { timestamps: false }
             );
@@ -250,7 +241,7 @@ const PostController = {
                     req.user._id,
                     { $pull: { likedPosts: post._id } }
                 );
-                return res.send({ msg: "Post unliked" });
+                return res.send({ msg: "Post unliked", _id: post._id });
             } else {
                 return res.status(404).send({ msg: "Error unliking post" });
             }
