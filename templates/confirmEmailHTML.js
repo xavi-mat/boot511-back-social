@@ -3,7 +3,7 @@
 const confirmEmailHTML = (username, email, token, domain) => {
 
     const lang = 'es';
-    const logo = domain + '/public/logo.png'
+    const logo = domain + '/logo.png'
 
     const MSG001 = 'NombreApp: Verificar cuenta nueva';
     const MSG002 = 'LogoApp';

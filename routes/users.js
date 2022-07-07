@@ -11,6 +11,7 @@ router.get('/', authentication, UserController.getData);
 router.get('/confirm/:emailToken', UserController.confirmEmail);
 router.get('/search', UserController.searchByUsername);
 router.get('/id/:_id', UserController.getById);
+router.get('/relations', authentication, UserController.getRelations);
 router.put('/', authentication, uploadAvatar.single('avatar'), UserController.update);
 router.put('/follow/:_id', authentication, UserController.follow);
 router.delete('/delete', authentication, UserController.delete);

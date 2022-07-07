@@ -226,14 +226,15 @@ const UserController = {
             }
             const user = await User.findOneAndUpdate(
                 { _id: req.params._id, followers: { $nin: req.user._id }, active: true },
-                { $push: { followers: req.user._id } }
+                { $push: { followers: req.user._id } },
+                { projection: { username: 1, avatar: 1, role: 1 } }
             );
             if (user) {
                 await User.findByIdAndUpdate(
                     req.user._id,
                     { $push: { following: req.params._id } }
                 );
-                return res.send({ msg: "Following" })
+                return res.send({ msg: "Following", user })
             } else {
                 return res.status(400).send({ msg: 'Error following user' });
             }
@@ -408,6 +409,29 @@ const UserController = {
         } catch (error) {
             error.origin = 'user';
             error.suborigin = 'delete';
+            next(error);
+        }
+    },
+    async getRelations(req, res, next) {
+        try {
+            let user = await User.findOne({ _id: req.user._id }, { following: 1, followers: 1 })
+                .populate({
+                    path: 'following',
+                    select: { username: 1, avatar: 1, role: 1 }
+                })
+                .populate({
+                    path: 'followers',
+                    select: { username: 1, avatar: 1, role: 1 }
+                })
+            if (user) {
+                user = user.toObject();
+                return res.send({ msg: "User relations", user });
+            } else {
+                return res.status(404).send({ msg: "User not found" });
+            }
+        } catch (error) {
+            error.origin = 'user';
+            error.suborigin = 'getRelations';
             next(error);
         }
     }
