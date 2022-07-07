@@ -77,11 +77,11 @@ const UserController = {
             const comments = await Comment.deleteMany({});
             // Put 10 users
             const usersId = [];
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 40; i++) {
                 const user = {
                     username: faker.name.findName(),
                     email: `fake${i}@email.com`,
-                    passhash: bcrypt.hashSync('123456', 10),
+                    passhash: bcrypt.hashSync('1', 10),
                     avatar: faker.internet.avatar(),
                     role: i === 0 ? "admin" : "user",
                     confirmed: true,
