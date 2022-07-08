@@ -255,7 +255,7 @@ const UserController = {
                     req.user._id,
                     { $pull: { following: req.params._id } }
                 );
-                return res.send({ msg: "Unfollowing" });
+                return res.send({ msg: "Unfollowing", _id: user._id });
             } else {
                 return res.status(400).send({ msg: 'Error unfollowing user' });
             }
