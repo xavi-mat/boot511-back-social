@@ -250,6 +250,61 @@ const PostController = {
             error.suborigin = 'unlike';
             next(error);
         }
+    },
+    async getMoreLiked(req, res, next) {
+        try {
+            // const posts = await Post.find({ active: true })
+            //     .sort({ likes: -1 })
+            //     .limit(4)
+            //     .populate('author', { username: 1, avatar: 1, role: 1 });
+            const posts = await Post.aggregate([
+                {
+                    $project: {
+                        updatedAt: 1,
+                        image: 1,
+                        author: 1,
+                        text: 1,
+                        likesCount: { $size: "$likes" },
+                        commentsCount: { $size: "$comments" }
+                    }
+                },
+                {
+                    $sort: { "likesCount": -1 }
+                },
+                { $limit: 4 },
+                {
+                    $lookup: {
+                        from: 'users', localField: 'author', foreignField: '_id', as: 'author2'
+                    }
+                },
+                {
+                    $unwind: '$author2'
+                },
+                {
+                    $project: {
+                        updatedAt: 1,
+                        image: 1,
+                        author: 1,
+                        text: 1,
+                        likesCount: 1,
+                        commentsCount: 1,
+                        "author2._id": 1,
+                        "author2.username": 1,
+                        "author2.avatar": 1,
+                        "author2.role": 1,
+                    }
+                }
+            ])
+            if (posts) {
+                return res.send({ msg: "More liked posts", posts })
+            } else {
+                return res.status(400).send({ msg: "Error getting liked posts" });
+            }
+        } catch (error) {
+            error.origin = 'post';
+            error.suborigin = 'getMoreLiked';
+            next(error);
+        }
     }
 };
 
