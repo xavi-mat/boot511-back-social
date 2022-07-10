@@ -253,11 +253,8 @@ const PostController = {
     },
     async getMoreLiked(req, res, next) {
         try {
-            // const posts = await Post.find({ active: true })
-            //     .sort({ likes: -1 })
-            //     .limit(4)
-            //     .populate('author', { username: 1, avatar: 1, role: 1 });
             const posts = await Post.aggregate([
+                { $match: { active: true } },
                 {
                     $project: {
                         updatedAt: 1,
@@ -268,18 +265,14 @@ const PostController = {
                         commentsCount: { $size: "$comments" }
                     }
                 },
-                {
-                    $sort: { "likesCount": -1 }
-                },
+                { $sort: { "likesCount": -1 } },
                 { $limit: 4 },
                 {
                     $lookup: {
                         from: 'users', localField: 'author', foreignField: '_id', as: 'author2'
                     }
                 },
-                {
-                    $unwind: '$author2'
-                },
+                { $unwind: '$author2' },
                 {
                     $project: {
                         updatedAt: 1,

@@ -21,7 +21,7 @@ const authentication = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ msg: "Token error" });
+        return res.status(400).send({ msg: "Token error" });
     }
 }
 
@@ -48,7 +48,7 @@ const isPostAuthor = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ msg: "Error" })
+        return res.status(400).send({ msg: "Error" })
     }
 }
 
