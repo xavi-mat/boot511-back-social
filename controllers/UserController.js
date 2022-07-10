@@ -303,11 +303,11 @@ const UserController = {
             const user = await User.findOne(
                 { _id: req.params._id, active: true },
                 { email: 0 })
-            // .populate({ path: 'posts', select: { text: 1 } })
-            // .populate({ path: 'likedPosts', select: { text: 1 } })
-            // .populate({ path: 'following', select: { username: 1 } })
-            // .populate({ path: 'followers', select: { username: 1 } })
-            return res.send({ msg: "User data", user });
+            if (user) {
+                return res.send({ msg: "User data", user });
+            } else {
+                return res.status(404).send({ msg: "User not found" });
+            }
         } catch (error) {
             error.origin = 'user';
             error.suborigin = 'getById';
