@@ -417,11 +417,11 @@ const UserController = {
             let user = await User.findOne({ _id: req.user._id }, { following: 1, followers: 1 })
                 .populate({
                     path: 'following',
-                    select: { username: 1, avatar: 1, role: 1 }
+                    select: { username: 1, avatar: 1, role: 1, updatedAt: 1 }
                 })
                 .populate({
                     path: 'followers',
-                    select: { username: 1, avatar: 1, role: 1 }
+                    select: { username: 1, avatar: 1, role: 1, updatedAt: 1 }
                 })
             if (user) {
                 user = user.toObject();
