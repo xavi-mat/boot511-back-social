@@ -48,6 +48,7 @@ const UserController = {
             return res.status(201).send({
                 msg: "We have sent a mail to confirm the registration",
                 user,
+                url
             });
         } catch (error) {
             error.origin = 'user';
