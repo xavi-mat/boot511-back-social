@@ -21,7 +21,8 @@ const authentication = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        return res.status(400).send({ msg: "Token error" });
+        console.warn("ERROR.MESSAGE:", error.message);
+        return res.status(401).send({ msg: "Authorization error" });
     }
 }
 
@@ -33,7 +34,7 @@ const isAdmin = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ msg: "Error" })
+        return res.status(500).send({ msg: "Internal error" })
     }
 }
 
@@ -63,7 +64,7 @@ const isCommentAuthor = async (req, res, next) => {
         next();
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ msg: "Error" })
+        return res.status(500).send({ msg: "Internal error" })
     }
 }
 

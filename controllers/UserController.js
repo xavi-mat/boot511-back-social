@@ -403,7 +403,7 @@ const UserController = {
                 await User.deleteOne({ _id: req.user._id });
                 return res.send({ msg: "User deleted" });
             } else {
-                return res.status(500).send({ msg: "Error deleting user" });
+                return res.status(404).send({ msg: "User not found" });
             }
 
         } catch (error) {

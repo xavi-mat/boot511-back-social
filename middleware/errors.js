@@ -11,7 +11,7 @@ const typeError = (err, req, res, next) => {
     }
     else
         if (!err.origin) {
-            res.status(500).send({ msg: 'ERROR' });
+            res.status(500).send({ msg: 'Internal error' });
         } else {
             res.status(400).send({ msg: `Error: ${err.suborigin}-${err.origin}` });
         }
