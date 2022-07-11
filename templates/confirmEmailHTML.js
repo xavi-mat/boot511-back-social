@@ -3,7 +3,7 @@
 const confirmEmailHTML = (username, email, token, domain) => {
 
     const lang = 'es';
-    const logo = domain + '/logo.png'
+    const logo = domain + '/logo_big.png'
 
     const MSG001 = 'NombreApp: Verificar cuenta nueva';
     const MSG002 = 'LogoApp';
@@ -38,7 +38,7 @@ const confirmEmailHTML = (username, email, token, domain) => {
 <table border="0" cellpadding="0" cellspacing="0" width="100%"><tr>
 <td style="padding: 20px 0 30px 0;">
 <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; border: 1px solid #cccccc;"><tr>
-<td align="center" bgcolor="#70bbd9" style="padding: 40px 0 30px 0;">
+<td align="center" bgcolor="#f0f3f9" style="padding: 40px 0 30px 0;">
 <img src="${logo}" alt="${MSG002}" width="230" height="230" style="display: block;" />
 </td></tr><tr><td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
 <table border="0" cellpadding="0" cellspacing="0" width="100%"><tr>

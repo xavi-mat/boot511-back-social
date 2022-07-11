@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const MAIN_URL = process.env.MAIN_URL;
+const FRONT_URL = process.env.FRONT_URL;
 const transporter = require("../config/nodemailer");
 const confirmEmailHTML = require("../templates/confirmEmailHTML");
 const fs = require("fs");  // Used for the fakeEmail
@@ -62,7 +63,8 @@ const UserController = {
                 { email: payload.email },
                 { confirmed: true }
             );
-            return res.send('<a href="' + MAIN_URL + '">Go to the main page</a>');
+            return res.redirect(FRONT_URL + "/login");
+            // return res.send('<a href="' + MAIN_URL + '">Go to the main page</a>');
         } catch (error) {
             error.origin = 'user';
             error.suborigin = 'confirmEmail';

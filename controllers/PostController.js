@@ -91,10 +91,6 @@ const PostController = {
                 .limit(limit)
                 .skip(limit * (page - 1))
                 .populate('author', { username: 1, avatar: 1, role: 1 })
-            // .populate({
-            //     path: 'comments',
-            //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
-            // });
             return res.send({ msg: "All posts", total, page, maxPages, posts });
         } catch (error) {
             error.origin = 'post';
@@ -119,11 +115,6 @@ const PostController = {
                 .sort('-createdAt')
                 .limit(limit)
                 .skip(limit * (page - 1))
-            // .populate('author', { username: 1, avatar: 1, role: 1 })
-            // .populate({
-            //     path: 'comments',
-            //     populate: { path: 'author', select: { username: 1, avatar: 1, role: 1 } }
-            // });
             return res.send({ msg: "Posts by UserId", total, page, maxPages, posts });
         } catch (error) {
             error.origin = 'post';
@@ -199,7 +190,7 @@ const PostController = {
                 });
                 return res.send({ msg: "Post deleted", post });
             } else {
-                return res.status(400).send({ msg: "Can't delete post" });
+                return res.status(404).send({ msg: "Post not found" });
             }
         } catch (error) {
             error.origin = 'post';
