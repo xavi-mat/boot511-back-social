@@ -65,7 +65,6 @@ const UserController = {
                 { confirmed: true }
             );
             return res.redirect(FRONT_URL + "/login");
-            // return res.send('<a href="' + MAIN_URL + '">Go to the main page</a>');
         } catch (error) {
             error.origin = 'user';
             error.suborigin = 'confirmEmail';
@@ -126,10 +125,6 @@ const UserController = {
     async login(req, res, next) {
         try {
             let user = await User.findOne({ email: req.body.email })
-            // .populate({ path: "following", select: { username: 1, avatar: 1, role: 1  } })
-            // .populate({ path: "followers", select: { username: 1, avatar: 1, role: 1  } })
-            // .populate({ path: "posts", select: { text: 1 } })
-            // .populate({ path: "likedPosts", select: { text: 1 } })
             if (!user) {
                 return res.status(400).send({ msg: "Wrong credentials" });
             }
@@ -169,14 +164,12 @@ const UserController = {
         try {
             const user = await User.findById(
                 req.user._id)
-                // { tokens: 0, confirmed: 0, active: 0, passhash: 0 })
                 .populate('posts', { author: 0 })
                 .populate('comments', { author: 0, postId: 0 })
                 .populate({ path: 'followers', select: { username: 1, avatar: 1, role: 1 } });
             return res.send({
                 msg: "User data",
                 user,
-                // followersCount: user.followers.length
             });
         } catch (error) {
             error.origin = 'user';
