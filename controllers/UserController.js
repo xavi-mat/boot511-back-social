@@ -46,7 +46,7 @@ const UserController = {
             // Fake email: Create html web with link
             fs.writeFileSync('public/fakeEmail.html', confirmEmailContent);
             return res.status(201).send({
-                msg: "We have sent a mail to confirm the registration",
+                msg: "Registration successful",
                 user,
                 url
             });
